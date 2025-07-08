@@ -1,0 +1,47 @@
+import unittest
+from datetime import time
+from your_module_name import Menu, Franchise  # Replace 'your_module_name' with the actual filename (without .py)
+
+class TestBastaFazoolin(unittest.TestCase):
+    def setUp(self):
+        self.brunch_items = {
+            "pancakes": 7.50,
+            "waffles": 9.00,
+            "burger": 11.00,
+            "coffee": 1.50,
+            "mimosa": 10.50
+        }
+        self.brunch = Menu("Brunch", self.brunch_items, time(11, 0), time(16, 0))
+
+        self.dinner_items = {
+            "duck ragu": 19.50,
+            "pizza": 11.00,
+            "coffee": 2.00
+        }
+        self.dinner = Menu("Dinner", self.dinner_items, time(17, 0), time(22, 0))
+
+        self.franchise = Franchise("123 Fazoolin' St", [self.brunch, self.dinner])
+
+    def test_menu_repr(self):
+        self.assertIn("Brunch menu", repr(self.brunch))
+
+    def test_calculate_bill(self):
+        bill = self.brunch.calculate_bill(["pancakes", "coffee"])
+        self.assertEqual(bill, 9.00)
+
+    def test_calculate_bill_partial_items(self):
+        bill = self.brunch.calculate_bill(["pancakes", "steak"])  # steak not on menu
+        self.assertEqual(bill, 7.50)
+
+    def test_available_menus_morning(self):
+        menus = self.franchise.available_menus(time(12, 0))  # Noon
+        self.assertIn(self.brunch, menus)
+        self.assertNotIn(self.dinner, menus)
+
+    def test_available_menus_evening(self):
+        menus = self.franchise.available_menus(time(18, 0))  # 6 PM
+        self.assertIn(self.dinner, menus)
+        self.assertNotIn(self.brunch, menus)
+
+if __name__ == "__main__":
+    unittest.main()
